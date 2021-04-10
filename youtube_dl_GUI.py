@@ -49,6 +49,10 @@ def convert():
                 """print("MP3 Diff dir same name")"""
                 system("youtube-dl -o \"" + folder.get() +
                        "/%(title)s.%(ext)s\" --extract-audio --audio-format mp3 " + url.get())
+    url.delete(0, END)
+    url.insert(0, "")
+    name.delete(0, END)
+    name.insert(0, "")
 
 
 gui = Tk(className="Convert Youtube video to mp3 or mp4")
