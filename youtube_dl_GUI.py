@@ -10,6 +10,7 @@ def mp3_mode():
     artist.config(state='normal')
     album.config(state='normal')
     meta_check.config(state=NORMAL)
+    meta_check2.config(state=NORMAL)
 
 
 def mp4_mode():
@@ -17,6 +18,7 @@ def mp4_mode():
     artist.config(state='disabled')
     album.config(state='disabled')
     meta_check.config(state=DISABLED)
+    meta_check2.config(state=DISABLED)
 
 
 def changedir():
@@ -24,7 +26,7 @@ def changedir():
     if(len(folder.get()) != 0):
         curdir.config(text="Current directory : " + folder.get())
     else:
-        curdir.config(text="Current directory : " + getcwd())
+        curdir.config(text="Current directory : " + os.getcwd())
 
 
 def convert():
@@ -48,69 +50,74 @@ def convert():
                 os.system("youtube-dl -f mp4 -o \"" + folder.get() +
                           "/%(title)s.%(ext)s\" " + url.get())
     else:
-        os.system("youtube-dl --write-info-json --skip-download " + url.get())
-        os.system("ren *.json metadata.json")
-        with open("metadata.json") as json_file:
-            md = json.load(json_file)
-        if(md["uploader"][-8:] == " - Topic"):
-            def_artist = md["uploader"][:-8]
-        else:
-            def_artist = md["uploader"]
-        def_album = md["album"]
-        fn = md["title"]
+        if(mdoff.get()):
+            os.system("youtube-dl --write-info-json --skip-download " + url.get())
+            os.system("ren *.json metadata.json")
+            with open("metadata.json") as json_file:
+                md = json.load(json_file)
+            if(md["uploader"][-8:] == " - Topic"):
+                def_artist = md["uploader"][:-8]
+            else:
+                def_artist = md["uploader"]
+            def_album = md["album"]
+            fn = md["title"]
 
         if(len(folder.get()) == 0):
             if(rename.get()):
                 # print("MP3 Same dir diff name")
                 os.system("youtube-dl -o \"" + name.get() +
                           ".mp3\" --extract-audio --audio-format mp3 " + url.get())
-                audiofile = eyed3.load(
-                    os.getcwd() + "\\" + name.get() + ".mp3")
-                if(edit_metadata.get()):
-                    audiofile.tag.artist = artist.get()
-                    audiofile.tag.album = album.get()
-                else:
-                    audiofile.tag.artist = def_artist
-                    audiofile.tag.album = def_album
-                audiofile.tag.save()
+                if(mdoff.get()):
+                    audiofile = eyed3.load(
+                        os.getcwd() + "\\" + name.get() + ".mp3")
+                    if(edit_metadata.get()):
+                        audiofile.tag.artist = artist.get()
+                        audiofile.tag.album = album.get()
+                    else:
+                        audiofile.tag.artist = def_artist
+                        audiofile.tag.album = def_album
+                    audiofile.tag.save()
             else:
                 # print("MP3 Same dir same name")
                 os.system(
                     "youtube-dl -o \"%(title)s.%(ext)s\" --extract-audio --audio-format mp3 " + url.get())
-                audiofile = eyed3.load(os.getcwd() + "\\" + fn + ".mp3")
-                if(edit_metadata.get()):
-                    audiofile.tag.artist = artist.get()
-                    audiofile.tag.album = album.get()
-                else:
-                    audiofile.tag.artist = def_artist
-                    audiofile.tag.album = def_album
-                audiofile.tag.save()
+                if(mdoff.get()):
+                    audiofile = eyed3.load(os.getcwd() + "\\" + fn + ".mp3")
+                    if(edit_metadata.get()):
+                        audiofile.tag.artist = artist.get()
+                        audiofile.tag.album = album.get()
+                    else:
+                        audiofile.tag.artist = def_artist
+                        audiofile.tag.album = def_album
+                    audiofile.tag.save()
         else:
             if(rename.get()):
                 # print("MP3 Diff dir diff name")
                 os.system("youtube-dl -o \"" + folder.get() + "/" + name.get() +
                           ".mp3\" --extract-audio --audio-format mp3 " + url.get())
-                audiofile = eyed3.load(
-                    folder.get() + "\\" + name.get() + ".mp3")
-                if(edit_metadata.get()):
-                    audiofile.tag.artist = artist.get()
-                    audiofile.tag.album = album.get()
-                else:
-                    audiofile.tag.artist = def_artist
-                    audiofile.tag.album = def_album
-                audiofile.tag.save()
+                if(mdoff.get()):
+                    audiofile = eyed3.load(
+                        folder.get() + "\\" + name.get() + ".mp3")
+                    if(edit_metadata.get()):
+                        audiofile.tag.artist = artist.get()
+                        audiofile.tag.album = album.get()
+                    else:
+                        audiofile.tag.artist = def_artist
+                        audiofile.tag.album = def_album
+                    audiofile.tag.save()
             else:
                 # print("MP3 Diff dir same name")
                 os.system("youtube-dl -o \"" + folder.get() +
                           "/%(title)s.%(ext)s\" --extract-audio --audio-format mp3 " + url.get())
-                audiofile = eyed3.load(folder.get() + "\\" + fn + ".mp3")
-                if(edit_metadata.get()):
-                    audiofile.tag.artist = artist.get()
-                    audiofile.tag.album = album.get()
-                else:
-                    audiofile.tag.artist = def_artist
-                    audiofile.tag.album = def_album
-                audiofile.tag.save()
+                if(mdoff.get()):
+                    audiofile = eyed3.load(folder.get() + "\\" + fn + ".mp3")
+                    if(edit_metadata.get()):
+                        audiofile.tag.artist = artist.get()
+                        audiofile.tag.album = album.get()
+                    else:
+                        audiofile.tag.artist = def_artist
+                        audiofile.tag.album = def_album
+                    audiofile.tag.save()
 
         os.system("del /f metadata.json")
     url.delete(0, END)
@@ -126,6 +133,7 @@ flag = BooleanVar()
 rename = BooleanVar()
 folder = StringVar()
 edit_metadata = BooleanVar()
+mdoff = BooleanVar()
 
 Label(gui, font=("Ariel", 10), text="Select mp3/mp4 : ").place(x=5, y=7)
 Radiobutton(gui, text="MP3", variable=flag, value='False',
@@ -158,6 +166,9 @@ conv = Button(gui, text="Convert", width=10, height=1,
 meta_check = Checkbutton(gui, text="Specify your own metadata for the *.mp3 file", variable=edit_metadata,
                          onvalue='True', offvalue='False', height=1, width=50)
 meta_check.place(x=-50, y=180)
+meta_check2 = Checkbutton(gui, text="Write metadata to this song", variable=mdoff,
+                          onvalue='True', offvalue='False', height=1, width=50)
+meta_check2.place(x=250, y=180)
 
 Label(gui, text="Artist : ").place(x=5, y=210)
 artist = Entry(gui, width=50)
