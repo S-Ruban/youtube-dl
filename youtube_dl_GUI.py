@@ -29,29 +29,29 @@ def changedir():
         curdir.config(text="Current directory : " + os.getcwd())
 
 
-def convert():
+def convert(link):
     if(flag.get()):
         if(len(folder.get()) == 0):
             if(rename.get()):
                 # print("MP4 Same dir diff name")
                 os.system("youtube-dl -f mp4 -o \"" +
-                          name.get() + ".mp4\" " + url.get())
+                          name.get() + ".mp4\" " + link)
             else:
                 # print("MP4 Same dir same name")
                 os.system(
-                    "youtube-dl -f mp4 -o \"%(title)s.%(ext)s\" " + url.get())
+                    "youtube-dl -f mp4 -o \"%(title)s.%(ext)s\" " + link)
         else:
             if(rename.get()):
                 # print("MP4 Diff dir diff name")
                 os.system("youtube-dl -f mp4 -o \"" + folder.get() +
-                          "/" + name.get() + ".mp4\" " + url.get())
+                          "/" + name.get() + ".mp4\" " + link)
             else:
                 # print("MP4 Diff dir same name")
                 os.system("youtube-dl -f mp4 -o \"" + folder.get() +
-                          "/%(title)s.%(ext)s\" " + url.get())
+                          "/%(title)s.%(ext)s\" " + link)
     else:
         if(mdoff.get()):
-            os.system("youtube-dl --write-info-json --skip-download " + url.get())
+            os.system("youtube-dl --write-info-json --skip-download " + link)
             os.system("ren *.json metadata.json")
             with open("metadata.json") as json_file:
                 md = json.load(json_file)
@@ -66,7 +66,7 @@ def convert():
             if(rename.get()):
                 # print("MP3 Same dir diff name")
                 os.system("youtube-dl -o \"" + name.get() +
-                          ".mp3\" --extract-audio --audio-format mp3 " + url.get())
+                          ".mp3\" --extract-audio --audio-format mp3 " + link)
                 if(mdoff.get()):
                     audiofile = eyed3.load(
                         os.getcwd() + "\\" + name.get() + ".mp3")
@@ -80,7 +80,7 @@ def convert():
             else:
                 # print("MP3 Same dir same name")
                 os.system(
-                    "youtube-dl -o \"%(title)s.%(ext)s\" --extract-audio --audio-format mp3 " + url.get())
+                    "youtube-dl -o \"%(title)s.%(ext)s\" --extract-audio --audio-format mp3 " + link)
                 if(mdoff.get()):
                     audiofile = eyed3.load(os.getcwd() + "\\" + fn + ".mp3")
                     if(edit_metadata.get()):
@@ -94,7 +94,7 @@ def convert():
             if(rename.get()):
                 # print("MP3 Diff dir diff name")
                 os.system("youtube-dl -o \"" + folder.get() + "/" + name.get() +
-                          ".mp3\" --extract-audio --audio-format mp3 " + url.get())
+                          ".mp3\" --extract-audio --audio-format mp3 " + link)
                 if(mdoff.get()):
                     audiofile = eyed3.load(
                         folder.get() + "\\" + name.get() + ".mp3")
@@ -108,7 +108,7 @@ def convert():
             else:
                 # print("MP3 Diff dir same name")
                 os.system("youtube-dl -o \"" + folder.get() +
-                          "/%(title)s.%(ext)s\" --extract-audio --audio-format mp3 " + url.get())
+                          "/%(title)s.%(ext)s\" --extract-audio --audio-format mp3 " + link)
                 if(mdoff.get()):
                     audiofile = eyed3.load(folder.get() + "\\" + fn + ".mp3")
                     if(edit_metadata.get()):
@@ -126,6 +126,10 @@ def convert():
     name.insert(0, "")
 
 
+def down():
+    convert(url.get())
+
+
 gui = Tk(className="Convert Youtube video to mp3 or mp4")
 gui.geometry("600x300")
 
@@ -135,7 +139,7 @@ folder = StringVar()
 edit_metadata = BooleanVar()
 mdoff = BooleanVar()
 
-Label(gui, font=("Ariel", 10), text="Select mp3/mp4 : ").place(x=5, y=7)
+Label(gui, text="Select mp3/mp4 : ").place(x=5, y=7)
 Radiobutton(gui, text="MP3", variable=flag, value='False',
             indicatoron=0, height=1, width=10, command=mp3_mode).place(x=125, y=5)
 Radiobutton(gui, text="MP4", variable=flag, value='True',
@@ -161,7 +165,7 @@ chdir = Button(gui, text="Change Directory", width=20,
                height=1, command=changedir).place(x=425, y=115)
 
 conv = Button(gui, text="Convert", width=10, height=1,
-              command=convert).place(x=250, y=150)
+              command=down).place(x=250, y=150)
 
 meta_check = Checkbutton(gui, text="Specify your own metadata for the *.mp3 file", variable=edit_metadata,
                          onvalue='True', offvalue='False', height=1, width=50)
