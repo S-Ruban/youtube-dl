@@ -36,7 +36,7 @@ def down():
     url.insert(0, "")
 
 
-gui = Tk(className="Convert Youtube video to mp3 or mp4")
+gui = Tk(className="Download albums from Youtube Music")
 gui.geometry("600x125")
 
 folder = StringVar()
